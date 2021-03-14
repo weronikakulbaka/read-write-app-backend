@@ -1,12 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using CsvHelper;
 using Newtonsoft.Json.Linq;
-using System;
+using ReadWriteAppBE.Models;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 
@@ -14,84 +11,55 @@ namespace ReadWriteAppBE.Controllers
 {
     public class UploadController : ApiController
     {
-        public class Product
-        {
-            public string Producent { get; set; }
-            public string Matryca { get; set; }
-            public string Rozdzielczosc { get; set; }
-            public string TypMatrycy { get; set; }
-            public string LiczbaRdzeniFizycznych { get; set; }
-            public string Taktowanie { get; set; }
-            public string RAM { get; set; }
-            public string PojemnoscDysku { get; set; }
-            public string TypDysku { get; set; }
-            public string KartaGraficzna { get; set; }
-            public string PamiecKartyGraficznej { get; set; }
-            public string SystemOperacyjny { get; set; }
-            public string NapedOptyczny { get; set; }
-        }
-
-        public HttpResponseMessage Post(HttpRequestMessage changedProducts)
+        public HttpResponseMessage Post(Product[] sendData)
         {
             var filePath = @"E:\STUDIA_III_SEMESTR\IntegracjaSystemowLab\Lab2\ReadWriteAppBE\ReadWriteAppBE\Resources\katalog.txt";
             string[] lines = File.ReadAllLines(filePath);
            
             List<Product> products = new List<Product>();
-            var valueFromClient = changedProducts.Content.ReadAsStringAsync().Result;
-
-            //using (StreamWriter file = File.CreateText(@"E:\STUDIA_III_SEMESTR\IntegracjaSystemowLab\Lab2\ReadWriteAppBE\ReadWriteAppBE\Resources\test.txt"))
-            //{
-            //    JsonSerializer serializer = new JsonSerializer();
-            //    //serialize object directly into file stream
-            //    serializer.Serialize(file, valueFromClient);
-            //}
-
             foreach (string line in lines)
             {
-                // Use a tab to indent each line of the file.
                 var element = line.Split(';');
-
                 Product product = new Product();
                 product.Producent = element[0];
                 product.Matryca = element[1];
                 product.Rozdzielczosc = element[2];
                 product.TypMatrycy = element[3];
-                product.LiczbaRdzeniFizycznych = element[4];
-                product.Taktowanie = element[5];
-                product.RAM = element[6];
-                product.PojemnoscDysku = element[7];
-                product.TypDysku = element[8];
-                product.KartaGraficzna = element[9];
-                product.PamiecKartyGraficznej = element[10];
-                product.SystemOperacyjny = element[11];
+                product.DotykowyEkran = element[4];
+                product.CPU = element[5];
+                product.IloscRdzeni = element[6];
+                product.MHZ = element[7];
+                product.RAM = element[8];
+                product.PojemnoscDysku = element[9];
+                product.RodzajDysku = element[10];
+                product.GPU = element[11];
+                product.VRAM = element[12];
+                product.SystemOperacyjny = element[12];
                 product.NapedOptyczny = element[12];
                 products.Add(product);
-                Console.WriteLine(products);
             }
 
+            if(sendData != null)
+            {
+                StringBuilder sb = new StringBuilder("");
+                foreach (Product data in sendData)
+                {
+                    var dataElement = data.Producent + ";" + data.Matryca + ";" 
+                        + data.Rozdzielczosc + ";" + data.TypMatrycy + ";" 
+                        + data.DotykowyEkran + ";" + data.CPU + ";" 
+                        + data.IloscRdzeni + ";" + data.MHZ + ";" 
+                        + data.RAM + ";" + data.PojemnoscDysku + ";" 
+                        + data.RodzajDysku + ";" + data.GPU + ";" + data.VRAM + ";" + data.SystemOperacyjny + ";" + data.NapedOptyczny + "; \n";
+                    sb.Append(dataElement);
+                }
 
-
-            if (valueFromClient.Length > 0) {
-                StreamWriter sw = new StreamWriter(@"E:\STUDIA_III_SEMESTR\IntegracjaSystemowLab\Lab2\ReadWriteAppBE\ReadWriteAppBE\Resources\test.txt");
-                sw.WriteLine(valueFromClient);
-                sw.Close();
+                if (sb.ToString().Length > 10) {
+                    StreamWriter sw = new StreamWriter(@"E:\STUDIA_III_SEMESTR\IntegracjaSystemowLab\Lab2\ReadWriteAppBE\ReadWriteAppBE\Resources\zapisane-dane.txt");
+                    sw.WriteLine(sb.ToString());
+                    sw.Close();
+                }
             }
 
-            //var reader = new StreamReader(filePath);
-            //var data = reader.ReadToEnd();
-            //var dataBinary = Encoding.UTF8.GetBytes(data);
-            //var txtStream = new MemoryStream(dataBinary);
-
-            // create the response and returns it
-            //HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            //result.Content = new StreamContent(txtStream);
-            //result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
-            //result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-            //{
-            //    FileName = "katalog.txt"
-            //};
-
-            //return result;
 
             return new HttpResponseMessage()
             {
