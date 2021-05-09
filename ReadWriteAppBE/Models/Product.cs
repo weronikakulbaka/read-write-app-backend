@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,6 +9,7 @@ namespace ReadWriteAppBE.Models
 {
     public class Product
     {
+        public int Id { get; set; }
         public string Producent { get; set; }
         public string Matryca { get; set; }
         public string Rozdzielczosc { get; set; }
@@ -28,7 +30,8 @@ namespace ReadWriteAppBE.Models
     [XmlType("disc")]
     public class Disc
     {
-       public string @type { get; set; }
+        [JsonProperty("@type")]
+        public string @type { get; set; }
        public string storage { get; set; }
     }
 
@@ -55,6 +58,7 @@ namespace ReadWriteAppBE.Models
     [XmlType("screen")]
     public class Screen
     {
+        [JsonProperty("@touch")]
         [XmlAttribute("touch")]
         public string @touch { get; set; }
         [XmlElement("size")]
@@ -67,6 +71,7 @@ namespace ReadWriteAppBE.Models
     [XmlType("laptop")]
     public class ProductXML
     {
+        [JsonProperty("@id")]
         [XmlAttribute("id")]
         public int @id { get; set; }
         [XmlElement("disc")]
